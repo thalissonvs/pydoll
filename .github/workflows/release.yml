@@ -25,6 +25,20 @@ jobs:
       - name: Print Version
         run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
 
+      - name: Update Poetry version in pyproject.toml
+        run: |
+          poetry version "${{ steps.cz.outputs.version }}"
+          git add pyproject.toml
+          git commit -m "Update pyproject.toml to version ${{ steps.cz.outputs.version }}"
+          git push origin HEAD
+
+      - name: Update poetry.lock
+        run: |
+          poetry lock
+          git add poetry.lock
+          git commit -m "Update poetry.lock for version ${{ steps.cz.outputs.version }}"
+          git push origin HEAD
+
   release:
     name: Release
     needs: version
