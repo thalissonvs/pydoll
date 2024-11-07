@@ -36,7 +36,7 @@ jobs:
           git config user.email "github-actions@github.com"
           poetry version "${{ steps.cz.outputs.version }}"
           git add pyproject.toml
-          git commit -m "Update pyproject.toml to version ${{ steps.cz.outputs.version }}" --no-edit
+          git commit -m "Update pyproject.toml to version ${{ steps.cz.outputs.version }}"
           git push origin HEAD
 
       - name: Update poetry.lock
