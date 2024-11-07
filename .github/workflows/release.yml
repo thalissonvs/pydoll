@@ -32,6 +32,8 @@ jobs:
 
       - name: Update Poetry version in pyproject.toml
         run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           poetry version "${{ steps.cz.outputs.version }}"
           git add pyproject.toml
           git commit -m "Update pyproject.toml to version ${{ steps.cz.outputs.version }}" --no-edit
@@ -39,9 +41,11 @@ jobs:
 
       - name: Update poetry.lock
         run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           poetry lock
           git add poetry.lock
-          git commit -m "Update poetry.lock for version ${{ steps.cz.outputs.version }}" --no-edit
+          git commit -m "Update poetry.lock for version ${{ steps.cz.outputs.version }}" 
           git push origin HEAD
 
   release:
