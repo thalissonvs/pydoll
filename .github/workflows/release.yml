@@ -37,7 +37,7 @@ jobs:
           poetry version "${{ steps.cz.outputs.version }}"
           git add pyproject.toml
           git commit -m "Update pyproject.toml to version ${{ steps.cz.outputs.version }}"
-          git push origin HEAD
+          git push
 
       - name: Update poetry.lock
         run: |
@@ -46,7 +46,7 @@ jobs:
           poetry lock
           git add poetry.lock
           git commit -m "Update poetry.lock for version ${{ steps.cz.outputs.version }}" 
-          git push origin HEAD
+          git push
 
   release:
     name: Release
