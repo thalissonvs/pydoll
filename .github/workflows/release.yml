@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -25,10 +25,6 @@ jobs:
       - name: Print Version
         run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
 
-      - name: Permissions
-        run: |
-          chown -R $(whoami) .
-
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
@@ -38,14 +34,14 @@ jobs:
         run: |
           poetry version "${{ steps.cz.outputs.version }}"
           git add pyproject.toml
-          git commit -m "Update pyproject.toml to version ${{ steps.cz.outputs.version }}"
+          git commit -m "Update pyproject.toml to version ${{ steps.cz.outputs.version }}" --no-edit
           git push origin HEAD
 
       - name: Update poetry.lock
         run: |
           poetry lock
           git add poetry.lock
-          git commit -m "Update poetry.lock for version ${{ steps.cz.outputs.version }}"
+          git commit -m "Update poetry.lock for version ${{ steps.cz.outputs.version }}" --no-edit
           git push origin HEAD
 
   release:
