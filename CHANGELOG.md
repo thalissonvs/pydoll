@@ -1,0 +1,102 @@
+## 0.1.0 (2024-11-07)
+
+### Feat
+
+- add method to delete all cookies from the browser session
+- add is_enabled property to check element's enabled status
+- add option to raise exception in wait_element method
+- add method to set browser download path via command
+- refactor text extraction using BeautifulSoup for accuracy
+- add method to get properties and improve XPath handling
+- refactor text retrieval methods and improve code readability
+- add timeout parameter to page navigation and loading methods
+- add cookie management and scroll into view functionality
+- add method to retrieve page PDF data as base64 string
+- add async property to retrieve inner HTML of the element
+- add async page_source property to retrieve page source code
+- add async property to retrieve the current page URL
+- add method to find multiple DOM elements using selectors
+- refactor WebElement to use FindElementsMixin for clarity
+- add FindElementsMixin for asynchronous DOM element handling
+- add methods to retrieve network response bodies from logs
+- add method to retrieve matching network logs from the page
+- add cookie management methods to the Browser class
+- add ElementNotFound exception to handle missing elements
+- add value property and handle option tag clicks in WebElement
+- rename FIND_ELEMENT_XPATH_TEMPLATE to EVALUATE_TEMPLATE
+- add exception handling for element not found in find_element method
+- downgrade Python version requirement to 3.10 in pyproject.toml
+- add async function to fetch browser WebSocket address
+- simplify text input handling by using insert_text command
+- add TargetCommands class for managing target operations
+- add method to generate command for disabling the Page domain
+- add method to generate text insertion commands for inputs
+- add Page class to manage browser page interactions and events
+- add page management methods to the Browser class
+- add detailed logging for command responses and event handling
+- add event classes for browser, DOM, fetch, and network actions
+- add NetworkCommands class for managing network operations
+- implement fetch command methods for handling requests and responses
+- add method to enable DOM domain events in DomCommands class
+- add proxy configuration and fetch event handling to Browser
+- refactor connection errors to use custom exceptions for clarity
+- add methods to clear callbacks and close WebSocket connection
+- remove unnecessary newline at the end of PageEvents class file
+- add context managers and async file handling for efficiency
+- implement singleton pattern and prevent multiple initializations
+- add dynamic connection port handling for browser instance
+- add temporary directory management for browser session storage
+- add logging for connection events and command executions
+- add PageEvents class with PAGE_LOADED event constant
+- add temporary callback option to event registration method
+- add page event handling and improve loading timeout management
+- add utility function to decode base64 images to bytes
+- add WebElement class for handling browser elements asynchronously
+- add enumeration for selector types in constants module
+- add PageCommands class for browser page control functions
+- add InputCommands class for handling mouse and keyboard events
+- implement DOM commands for interacting with web elements
+- refactor BrowserCommands to include new window management methods
+- implement some basic methods to navigate and control the browser instance
+- enhance ConnectionHandler with detailed docstrings for methods
+- add .gitignore, .python-version, and poetry.lock files
+
+### Fix
+
+- browser context now uses the storage commands to get cookies, while the page context us cookies, while page context uses network
+- update cookie retrieval to use NetworkCommands for consistency
+- remove download path method from Browser and add to Page class
+- add options to disable first-run and browser check flags
+- handle KeyError when retrieving network response bodies
+- use get() to safely retrieve attributes in WebElement class
+- rename class attribute retrieval for clarity and consistency
+- enhance get_properties and simplify text retrieval method
+- enhance create_web_element call with additional value parameter
+- fix incorrect key access in JavaScript evaluation result
+- update cookie management to clear browser cookies correctly
+- filter pages by title instead of URL in Browser class
+- filter out non-page entries when fetching valid page IDs
+- xpath element solved
+- refactor event callback storage to use unique callback IDs
+- add JavaScript execution method and enhance click offsets
+- simplify response handling and improve event callback structure
+- reorder page event enabling to ensure proper browser startup
+- add JSON handling and improve WebSocket command execution
+
+### Refactor
+
+- improve WebElement representation and handle None for nodeValue
+- add newline at end of file for ElementNotFound exception class
+- remove unused aiohttp import and clean up whitespace
+- remove unnecessary blank lines in storage.py for clarity
+- fix missing newline at the end of the file in page.py
+- remove unnecessary whitespace in InputCommands class methods
+- refactor DOM command methods for improved clarity and usability
+- refactor Page class to inherit from FindElementsMixin
+- refactor code to remove duplicate import of StorageCommands
+- clarify error messages for command and callback validation
+- refactor ConnectionHandler to simplify initialization and connect logic
+- remove unnecessary whitespace in element.py for cleaner code
+- refactor WebElement to enhance attribute retrieval methods
+- refactor connection handling and improve error messaging
+- refactor Browser class to use abstract base class and commands
