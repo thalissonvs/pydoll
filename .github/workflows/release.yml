@@ -2,10 +2,6 @@ name: Release
 
 on: workflow_dispatch
 
-permissions:
-  contents: write
-
-
 jobs:
   version:
     runs-on: ubuntu-latest
@@ -28,6 +24,10 @@ jobs:
 
       - name: Print Version
         run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
+
+      - name: Permissions
+        run: |
+          chown -R $(whoami) .
 
       - name: Install Poetry
         run: |
