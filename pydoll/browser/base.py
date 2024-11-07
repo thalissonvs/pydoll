@@ -215,8 +215,8 @@ class Browser(ABC):
             ValueError: If the browser is not currently running.
         """
         if await self._is_browser_running():
-            self.process.terminate()
             await self._execute_command(BrowserCommands.CLOSE)
+            self.process.terminate()
         else:
             raise exceptions.BrowserNotRunning('Browser is not running')
 
