@@ -2,6 +2,10 @@ name: Release
 
 on: workflow_dispatch
 
+permissions:
+  contents: write
+
+
 jobs:
   version:
     runs-on: ubuntu-latest
