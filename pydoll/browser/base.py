@@ -508,10 +508,10 @@ class Browser(ABC):  # noqa: PLR0904
 
     def _setup_user_dir(self):
         """Prepara o diretório de dados do usuário, se necessário."""
-        temp_dir = self._temp_directory_manager.create_temp_dir()
         if '--user-data-dir' not in [
             arg.split('=')[0] for arg in self.options.arguments
         ]:
+            temp_dir = self._temp_directory_manager.create_temp_dir()
             self.options.arguments.append(f'--user-data-dir={temp_dir.name}')
 
     @abstractmethod
