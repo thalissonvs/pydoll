@@ -6,13 +6,13 @@ from pydoll.connection.connection import CommandManager, EventsHandler
 
 @pytest.fixture
 def command_manager():
-    """Retorna uma instância fresca de CommandManager para os testes."""
+    """Returns a fresh instance of CommandManager for the tests."""
     return CommandManager()
 
 
 @pytest.fixture
 def events_handler():
-    """Retorna uma instância fresca de EventsHandler para os testes."""
+    """Returns a fresh instance of EventsHandler for the tests."""
     return EventsHandler()
 
 
@@ -20,13 +20,13 @@ def test_create_command_future(command_manager):
     test_command = {'method': 'TestMethod'}
     future_result = command_manager.create_command_future(test_command)
 
-    # Verifica se o ID foi atribuído corretamente
+    # Checks if the ID was assigned correctly.
     assert test_command['id'] == 1, 'The first command ID should be 1'
-    # Verifica se o future foi armazenado no dicionário de pendentes
+    # Checks if the future was stored in the pending dictionary.
     assert 1 in command_manager._pending_commands
     assert command_manager._pending_commands[1] is future_result
 
-    # Cria um segundo comando e verifica o incremento do ID
+    # Creates a second command and checks the ID increment.
     second_command = {'method': 'SecondMethod'}
     future_second = command_manager.create_command_future(second_command)
     assert second_command['id'] == 2, 'The second command ID should be 2'
@@ -39,12 +39,12 @@ def test_resolve_command(command_manager):
     future_result = command_manager.create_command_future(test_command)
     result_payload = '{"result": "success"}'
 
-    # O future não deve estar concluído antes da resolução
+    # The future should not be completed before resolution.
     assert not future_result.done(), (
         'The future should not be completed before resolution'
     )
 
-    # Resolve o comando e verifica o resultado
+    # Resolves the command and checks the result.
     command_manager.resolve_command(1, result_payload)
     assert future_result.done(), (
         'The future should be completed after resolution'
@@ -52,7 +52,7 @@ def test_resolve_command(command_manager):
     assert future_result.result() == result_payload, (
         'The future result does not match the expected result'
     )
-    # O comando pendente deve ser removido
+    # The pending command should be removed.
     assert 1 not in command_manager._pending_commands
 
 
@@ -60,7 +60,7 @@ def test_resolve_unknown_command(command_manager):
     test_command = {'method': 'TestMethod'}
     future_result = command_manager.create_command_future(test_command)
 
-    # Tenta resolver um ID inexistente; o future original deve permanecer pendente
+    # Attempts to resolve a nonexistent ID; the original future should remain pending.
     command_manager.resolve_command(999, '{"result": "ignored"}')
     assert not future_result.done(), (
         'The future should not be completed after resolving an unknown command'
@@ -71,7 +71,7 @@ def test_remove_pending_command(command_manager):
     test_command = {'method': 'TestMethod'}
     _ = command_manager.create_command_future(test_command)
 
-    # Remove o comando pendente e verifica se ele foi removido
+    # Removes the pending command and checks if it was successfully removed.
     command_manager.remove_pending_command(1)
     assert 1 not in command_manager._pending_commands, (
         'The pending command should be removed'
