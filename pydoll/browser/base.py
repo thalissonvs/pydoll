@@ -60,14 +60,36 @@ class Browser(ABC):  # noqa: PLR0904
         self._pages = []
 
     async def __aenter__(self):
+        """
+        Async context manager entry point.
+
+        Returns:
+            Browser: The browser instance.
+        """
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """
+        Async context manager exit point.
+
+        Args:
+            exc_type: The exception type, if raised.
+            exc_val: The exception value, if raised.
+            exc_tb: The traceback, if an exception was raised.
+        """
         await self.stop()
         await self._connection_handler.close()
 
     async def start(self) -> None:
-        """Método principal para iniciar o navegador."""
+        """
+        Main method to start the browser.
+
+        This method initializes the browser process and configures
+        all necessary settings to create a working browser instance.
+
+        Returns:
+            None
+        """
         binary_location = (
             self.options.binary_location or self._get_default_binary_location()
         )
@@ -110,6 +132,9 @@ class Browser(ABC):  # noqa: PLR0904
         """
         Retrieves a Page instance for an existing page in the browser.
         If no pages are open, a new page will be created.
+
+        Returns:
+            Page: A Page instance connected to an existing or new browser page.
         """
         page_id = (
             await self.new_page() if not self._pages else self._pages.pop()
@@ -155,7 +180,9 @@ class Browser(ABC):  # noqa: PLR0904
 
         Args:
             event_name (str): Name of the event to listen for.
-            callback (Callable): function to be called when the event occurs.
+            callback (callable): Function to be called when the event occurs.
+            temporary (bool): If True, the callback will be removed after it's
+                triggered once. Defaults to False.
 
         Returns:
             int: The ID of the registered callback.
@@ -176,8 +203,12 @@ class Browser(ABC):  # noqa: PLR0904
         """
         Opens a new page in the browser.
 
+        Args:
+            url (str): Optional initial URL to navigate to.
+                Defaults to empty string.
+
         Returns:
-            Page: The new page instance.
+            str: The ID of the new page.
         """
         response = await self._execute_command(
             TargetCommands.create_target(url)
@@ -424,17 +455,40 @@ class Browser(ABC):  # noqa: PLR0904
         await self.disable_fetch_events()
 
     async def _init_first_page(self):
+        """
+        Initializes the first page in the browser.
+
+        This method obtains the first valid page from available targets
+        and stores its ID for later use.
+
+        Returns:
+            None
+        """
         pages = await self.get_targets()
         valid_page = await self._get_valid_page(pages)
         self._pages.append(valid_page)
 
     async def _verify_browser_running(self):
-        """Verifica se o navegador está rodando."""
+        """
+        Verifies if the browser is running.
+
+        Raises:
+            BrowserNotRunning: If the browser failed to start.
+        """
         if not await self._is_browser_running():
             raise exceptions.BrowserNotRunning('Failed to start browser')
 
     async def _configure_proxy(self, private_proxy, proxy_credentials):
-        """Configura o proxy, se necessário."""
+        """
+        Configures proxy settings if needed.
+
+        Args:
+            private_proxy: Boolean indicating if a private proxy is enabled.
+            proxy_credentials: Tuple containing proxy username and password.
+
+        Returns:
+            None
+        """
         if private_proxy:
             await self.enable_fetch_events(handle_auth_requests=True)
             await self.on(
@@ -454,17 +508,28 @@ class Browser(ABC):  # noqa: PLR0904
 
     @staticmethod
     def _is_valid_page(page: dict) -> bool:
-        """Verifica se uma página é uma nova aba válida."""
+        """
+        Verifies if a page is a valid new tab.
+
+        Args:
+            page (dict): Dictionary containing page information.
+
+        Returns:
+            bool: True if the page is a valid new tab, False otherwise.
+        """
         return page.get('type') == 'page' and 'chrome://newtab/' in page.get(
             'url', ''
         )
 
     async def _get_valid_page(self, pages) -> str:
         """
-        Obtém o ID de uma página válida ou cria uma nova.
+        Gets the ID of a valid page or creates a new one.
+
+        Args:
+            pages (list): List of page dictionaries to check for validity.
 
         Returns:
-            str: targetId da página existente ou nova
+            str: The target ID of an existing or new page.
         """
         valid_page = next(
             (page for page in pages if self._is_valid_page(page)), None
@@ -507,7 +572,15 @@ class Browser(ABC):  # noqa: PLR0904
         )
 
     def _setup_user_dir(self):
-        """Prepara o diretório de dados do usuário, se necessário."""
+        """
+        Prepares the user data directory if needed.
+
+        This method creates a temporary directory for browser data if
+        no user directory is specified in the browser options.
+
+        Returns:
+            None
+        """
         temp_dir = self._temp_directory_manager.create_temp_dir()
         if '--user-data-dir' not in [
             arg.split('=')[0] for arg in self.options.arguments

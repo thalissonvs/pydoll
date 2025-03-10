@@ -22,8 +22,8 @@ class Page(FindElementsMixin):  # noqa: PLR0904
         Initializes the Page instance.
 
         Args:
-            connection_handler (ConnectionHandler): The connection handler
-                instance.
+            connection_port (int): The port number for the connection to the
+                browser.
             page_id (str): The ID of the page, obtained via the DevTools
                 Protocol.
         """
@@ -103,6 +103,11 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     async def close(self):
         """
         Closes the page.
+
+        This method closes the current page in the browser.
+
+        Returns:
+            None
         """
         await self._execute_command(PageCommands.close())
 
@@ -111,7 +116,8 @@ class Page(FindElementsMixin):  # noqa: PLR0904
         Retrieves the cookies of the page.
 
         Returns:
-            list: A list of cookies.
+            list[dict]: A list of dictionaries containing cookie data from
+                the current page.
         """
         response = await self._execute_command(
             NetworkCommands.get_all_cookies()
@@ -123,13 +129,20 @@ class Page(FindElementsMixin):  # noqa: PLR0904
         Sets cookies for the page.
 
         Args:
-            cookies (list): A list of cookies to set.
+            cookies (list[dict]): A list of dictionaries containing cookie
+                data to set for the current page.
         """
         await self._execute_command(NetworkCommands.set_cookies(cookies))
 
     async def delete_all_cookies(self):
         """
         Deletes all cookies from the browser.
+
+        This clears both storage cookies and browser cookies associated with
+        the current page.
+
+        Returns:
+            None
         """
         await self._execute_command(StorageCommands.clear_cookies())
         await self._execute_command(NetworkCommands.clear_browser_cookies())
@@ -173,6 +186,12 @@ class Page(FindElementsMixin):  # noqa: PLR0904
 
         Args:
             url (str): The URL to navigate to.
+            timeout (int): Maximum time in seconds to wait for page to load.
+                Defaults to 300 seconds.
+
+        Raises:
+            TimeoutError: If the page fails to load within the specified
+                timeout.
         """
         if await self._refresh_if_url_not_changed(url):
             return
@@ -187,6 +206,16 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     async def refresh(self):
         """
         Refreshes the page.
+
+        This method reloads the current page and waits for it to finish
+        loading.
+
+        Raises:
+            TimeoutError: If the page does not finish loading within the
+                default timeout period (300 seconds).
+
+        Returns:
+            None
         """
         await self._execute_command(PageCommands.refresh())
         try:
@@ -200,6 +229,9 @@ class Page(FindElementsMixin):  # noqa: PLR0904
 
         Args:
             path (str): The file path to save the screenshot to.
+
+        Returns:
+            None
         """
         fmt = path.split('.')[-1]
         if fmt not in {'jpeg', 'jpg', 'png'}:
@@ -250,10 +282,14 @@ class Page(FindElementsMixin):  # noqa: PLR0904
         Retrieves network logs from the page.
 
         Args:
-            matches (str): The URL pattern to match network logs against.
+            matches (list[str]): A list of URL patterns to match network logs
+                against. If empty, all logs are returned.
 
         Returns:
-            list: A list of network logs that match the specified pattern.
+            list: A list of network logs that match the specified patterns.
+
+        Raises:
+            LookupError: If no network logs match the specified patterns.
         """
         network_logs = self._connection_handler.network_logs
         logs_matched = []
@@ -303,7 +339,9 @@ class Page(FindElementsMixin):  # noqa: PLR0904
             request_id (str): The ID of the network request.
 
         Returns:
-            str: The response body of the network request.
+            tuple: A tuple containing:
+                - str: The response body content
+                - bool: Flag indicating if the body is base64 encoded
         """
         response = await self._execute_command(
             NetworkCommands.get_response_body(request_id)
@@ -316,6 +354,13 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     async def enable_page_events(self):
         """
         Enables page events for the page.
+
+        This allows listening for page-related events such as load, navigate,
+        and content change events. These events can be captured with the `on`
+        method.
+
+        Returns:
+            None
         """
         await self._execute_command(PageCommands.enable_page())
         self._page_events_enabled = True
@@ -323,6 +368,12 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     async def enable_network_events(self):
         """
         Enables network events for the page.
+
+        This allows listening for network-related events such as request and
+        response events. These events can be captured with the `on` method.
+
+        Returns:
+            None
         """
         await self._execute_command(NetworkCommands.enable_network_events())
         self._network_events_enabled = True
@@ -332,6 +383,17 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     ):
         """
         Enables fetch events for the page.
+
+        This allows interception of network requests before they are sent.
+
+        Args:
+            handle_auth (bool): Whether to handle authentication requests.
+                Defaults to False.
+            resource_type (str): The type of resource to intercept.
+                Defaults to 'Document'.
+
+        Returns:
+            None
         """
         await self._execute_command(
             FetchCommands.enable_fetch_events(handle_auth, resource_type)
@@ -341,6 +403,13 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     async def enable_dom_events(self):
         """
         Enables DOM events for the page.
+
+        This allows listening for DOM-related events such as node creation,
+        attribute modification, and node removal events. These events can be
+        captured with the `on` method.
+
+        Returns:
+            None
         """
         await self._execute_command(DomCommands.enable_dom_events())
         self._dom_events_enabled = True
@@ -348,6 +417,12 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     async def disable_fetch_events(self):
         """
         Disables fetch events for the page.
+
+        This stops the interception of network requests that was previously
+        enabled with enable_fetch_events().
+
+        Returns:
+            None
         """
         await self._execute_command(FetchCommands.disable_fetch_events())
         self._fetch_events_enabled = False
@@ -355,6 +430,12 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     async def disable_page_events(self):
         """
         Disables page events for the page.
+
+        This stops listening for page-related events that were previously
+        enabled with enable_page_events().
+
+        Returns:
+            None
         """
         await self._execute_command(PageCommands.disable_page())
         self._page_events_enabled = False
@@ -366,10 +447,15 @@ class Page(FindElementsMixin):  # noqa: PLR0904
         Registers an event listener for the page.
 
         Args:
-            event (str): The event to listen for.
+            event_name (str): The event name to listen for.
             callback (callable): The callback function to execute when the
                 event is triggered.
-            temporary (bool): Whether the event listener is temporary or not.
+            temporary (bool): If True, the callback will be removed after it's
+                triggered once. Defaults to False.
+
+        Returns:
+            int: The ID of the registered callback, which can be used to
+                remove the listener later.
         """
 
         async def callback_wrapper(event):
@@ -399,6 +485,12 @@ class Page(FindElementsMixin):  # noqa: PLR0904
 
         Args:
             script (str): The JavaScript script to execute.
+            element (WebElement, optional): The element to execute the script
+                on. Use 'argument' in your script to refer to this element.
+                Defaults to None.
+
+        Returns:
+            dict: The result of the script execution from the browser.
         """
         if element:
             script = script.replace('argument', 'this')
@@ -427,6 +519,14 @@ class Page(FindElementsMixin):  # noqa: PLR0904
     async def _wait_page_load(self, timeout: int = 300):
         """
         Waits for the page to finish loading.
+
+        Args:
+            timeout (int): Maximum time in seconds to wait for the page
+                to load. Defaults to 300 seconds.
+
+        Raises:
+            asyncio.TimeoutError: If the page does not finish loading within
+                the specified timeout.
         """
         start_time = asyncio.get_event_loop().time()
         while True:
