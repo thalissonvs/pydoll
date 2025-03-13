@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 from contextlib import suppress
 from tempfile import TemporaryDirectory
@@ -213,7 +212,7 @@ class TempDirectoryManager:
         Returns:
             TemporaryDirectory: The created temporary directory instance.
         """
-        temp_dir = self._temp_dir_factory(delete=False) # avoid auto-deletion
+        temp_dir = self._temp_dir_factory(delete=False)  # avoid auto-deletion
         self._temp_dirs.append(temp_dir)
         return temp_dir
 

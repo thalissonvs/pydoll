@@ -234,7 +234,7 @@ class Browser(ABC):  # noqa: PLR0904
         if await self._is_browser_running():
             await self._execute_command(BrowserCommands.CLOSE)
             self._browser_process_manager.stop_process()
-            await asyncio.sleep(1) # small delay to ensure browser is closed
+            await asyncio.sleep(1)  # small delay to ensure browser is closed
             self._temp_directory_manager.cleanup()
         else:
             raise exceptions.BrowserNotRunning('Browser is not running')
