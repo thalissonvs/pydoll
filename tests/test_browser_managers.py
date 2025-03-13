@@ -20,7 +20,10 @@ def proxy_options():
 def temp_manager():
     mock_dir = MagicMock()
     mock_dir.name = '/fake/temp/dir'
-    return TempDirectoryManager(temp_dir_factory=lambda: mock_dir)
+    mock_dir.cleanup = MagicMock()
+    return TempDirectoryManager(
+        temp_dir_factory=lambda delete: mock_dir
+    )
 
 
 @pytest.fixture
@@ -101,12 +104,10 @@ def test_cleanup_temp_dirs(temp_manager):
     mock_dir2 = MagicMock()
     temp_manager._temp_dirs = [mock_dir1, mock_dir2]
 
-    with patch('shutil.rmtree') as mock_rmtree:
-        temp_manager.cleanup()
+    temp_manager.cleanup()
 
-        assert mock_rmtree.call_count == 2
-        mock_rmtree.assert_any_call(mock_dir1.name)
-        mock_rmtree.assert_any_call(mock_dir2.name)
+    assert mock_dir1.cleanup.call_count == 1
+    assert mock_dir2.cleanup.call_count == 1
 
 
 def test_initialize_options_with_none():

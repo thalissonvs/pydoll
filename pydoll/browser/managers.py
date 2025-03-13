@@ -201,7 +201,7 @@ class TempDirectoryManager:
                 temporary directories. Defaults to TemporaryDirectory.
         """
         self._temp_dir_factory = temp_dir_factory
-        self._temp_dirs = []
+        self._temp_dirs: list[temp_dir_factory] = []
 
     def create_temp_dir(self):
         """
@@ -213,7 +213,7 @@ class TempDirectoryManager:
         Returns:
             TemporaryDirectory: The created temporary directory instance.
         """
-        temp_dir = self._temp_dir_factory()
+        temp_dir = self._temp_dir_factory(delete=False) # avoid auto-deletion
         self._temp_dirs.append(temp_dir)
         return temp_dir
 
@@ -222,15 +222,14 @@ class TempDirectoryManager:
         Cleans up all temporary directories created by this manager.
 
         This method removes all temporary directories created with
-        create_temp_dir, suppressing any OS errors that might occur
-        during deletion.
+        create_temp_dir.
 
         Returns:
             None
         """
         for temp_dir in self._temp_dirs:
             with suppress(OSError):
-                shutil.rmtree(temp_dir.name)
+                temp_dir.cleanup()
 
 
 class BrowserOptionsManager:
