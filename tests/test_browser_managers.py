@@ -22,7 +22,7 @@ def temp_manager():
     mock_dir.name = '/fake/temp/dir'
     mock_dir.cleanup = MagicMock()
     return TempDirectoryManager(
-        temp_dir_factory=lambda delete: mock_dir
+        temp_dir_factory=lambda **kwargs: mock_dir
     )
 
 
