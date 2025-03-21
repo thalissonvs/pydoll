@@ -1,16 +1,18 @@
 import asyncio
 from abc import ABC, abstractmethod
 from functools import partial
+import os
 from random import randint
 
 from pydoll import exceptions
+from pydoll.browser.constants import BrowserType
 from pydoll.browser.managers import (
     BrowserOptionsManager,
     BrowserProcessManager,
     ProxyManager,
     TempDirectoryManager,
 )
-from pydoll.browser.options import Options
+from pydoll.browser.options import EdgeOptions, Options
 from pydoll.browser.page import Page
 from pydoll.commands import (
     BrowserCommands,
@@ -35,6 +37,7 @@ class Browser(ABC):  # noqa: PLR0904
         self,
         options: Options | None = None,
         connection_port: int = None,
+        browser_type: BrowserType = None
     ):
         """
         Initializes the Browser instance.
@@ -43,11 +46,13 @@ class Browser(ABC):  # noqa: PLR0904
             options (Options | None): An instance of the Options class to
             configure the browser. If None, default options will be used.
             connection_port (int): The port to connect to the browser.
+            browser_type (BrowserType): The type of browser to use.
+                If None, it will be inferred from the options.
 
         Raises:
             TypeError: If any of the arguments are not callable.
         """
-        self.options = BrowserOptionsManager.initialize_options(options)
+        self.options = BrowserOptionsManager.initialize_options(options, browser_type)
         self._proxy_manager = ProxyManager(self.options)
         self._connection_port = (
             connection_port if connection_port else randint(9223, 9322)
@@ -547,21 +552,12 @@ class Browser(ABC):  # noqa: PLR0904
         return await self._connection_handler.execute_command(
             command, timeout=60
         )
-
+    
     def _setup_user_dir(self):
-        """
-        Prepares the user data directory if needed.
-
-        This method creates a temporary directory for browser data if
-        no user directory is specified in the browser options.
-
-        Returns:
-            None
-        """
-        temp_dir = self._temp_directory_manager.create_temp_dir()
-        if '--user-data-dir' not in [
-            arg.split('=')[0] for arg in self.options.arguments
-        ]:
+        """Prepares the user data directory if necessary."""
+        if '--user-data-dir' not in [arg.split('=')[0] for arg in self.options.arguments]:
+            # For all browsers, use a temporary directory
+            temp_dir = self._temp_directory_manager.create_temp_dir()
             self.options.arguments.append(f'--user-data-dir={temp_dir.name}')
 
     @abstractmethod

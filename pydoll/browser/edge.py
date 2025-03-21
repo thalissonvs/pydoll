@@ -6,12 +6,12 @@ from pydoll.browser.managers import BrowserOptionsManager
 from pydoll.browser.options import Options
 from pydoll.browser.constants import BrowserType
 
-class Chrome(Browser):
+class Edge(Browser):
     """
-    A class that implements the Chrome browser functionality.
+    A class that implements the Edge browser functionality.
 
     This class provides specific implementation for launching and
-    controlling Google Chrome browsers.
+    controlling Microsoft Edge browsers.
     """
 
     def __init__(
@@ -20,26 +20,26 @@ class Chrome(Browser):
         connection_port: Optional[int] = None,
     ):
         """
-        Initializes the Chrome browser instance.
+        Initializes the Edge browser instance.
 
         Args:
             options (Options | None): An instance of Options class to configure
                 the browser. If None, default options will be used.
             connection_port (int): The port to connect to the browser.
-                Defaults to 9222.
+                Defaults to a random port between 9223 and 9322.
         """
-        super().__init__(options, connection_port, BrowserType.CHROME)
+        super().__init__(options, connection_port, BrowserType.EDGE)
 
     @staticmethod
     def _get_default_binary_location():
         """
-        Gets the default location of the Chrome browser executable.
+        Gets the default location of the Edge browser executable.
 
-        This method determines the default Chrome executable path based
+        This method determines the default Edge executable path based
         on the operating system.
 
         Returns:
-            str: The path to the Chrome browser executable.
+            str: The path to the Edge browser executable.
 
         Raises:
             ValueError: If the operating system is not supported or
@@ -49,14 +49,14 @@ class Chrome(Browser):
 
         browser_paths = {
             'Windows': [
-                r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-                r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
+                r'C:\Program Files\Microsoft\Edge\Application\msedge.exe',
+                r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
             ],
             'Linux': [
-                '/usr/bin/google-chrome',
+                '/usr/bin/microsoft-edge',
             ],
             'Darwin': [
-                '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+                '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
             ]
         }
 

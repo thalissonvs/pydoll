@@ -1,3 +1,5 @@
+from pydoll.browser.constants import BrowserType
+
 class Options:
     """
     A class to manage command-line options for a browser instance.
@@ -25,6 +27,16 @@ class Options:
             list: A list of command-line arguments added to the options.
         """
         return self._arguments
+
+    @arguments.setter
+    def arguments(self, args_list: list):
+        """
+        Sets the list of command-line arguments.
+
+        Args:
+            args_list (list): A list of command-line arguments.
+        """
+        self._arguments = args_list
 
     @property
     def binary_location(self) -> str:
@@ -56,7 +68,15 @@ class Options:
         Raises:
             ValueError: If the argument is already in the list of arguments.
         """
-        if argument not in self.arguments:
-            self.arguments.append(argument)
+        if argument not in self._arguments:
+            self._arguments.append(argument)
         else:
             raise ValueError(f'Argument already exists: {argument}')
+
+class ChromeOptions(Options):
+    def __init__(self):
+        super().__init__()
+
+class EdgeOptions(Options):
+    def __init__(self):
+        super().__init__()
