@@ -180,7 +180,8 @@ class ConnectionHandler:
         Closes the WebSocket connection and clears all event callbacks.
         """
         await self.clear_callbacks()
-        await self._ws_connection.close()
+        if self._ws_connection is not None:
+            await self._ws_connection.close()
         logger.info('WebSocket connection closed.')
 
     async def _ensure_active_connection(self):

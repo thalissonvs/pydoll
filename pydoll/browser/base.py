@@ -82,7 +82,7 @@ class Browser(ABC):  # noqa: PLR0904
 
         await self._connection_handler.close()
 
-    async def start(self) -> None:
+    async def start(self, headless: bool = False) -> None:
         """
         Main method to start the browser.
 
@@ -95,6 +95,11 @@ class Browser(ABC):  # noqa: PLR0904
         binary_location = (
             self.options.binary_location or self._get_default_binary_location()
         )
+
+        if headless:
+            headless_arg = '--headless'
+            if headless_arg not in self.options.arguments:
+                self.options.add_argument(headless_arg)
 
         self._setup_user_dir()
         proxy_config = self._proxy_manager.get_proxy_credentials()
